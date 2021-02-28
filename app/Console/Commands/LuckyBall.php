@@ -12,7 +12,7 @@ class LuckyBall extends Command
      *
      * @var string
      */
-    protected $signature = 'luckyballs';
+    protected $signature = 'luckyballs {count=1}';
 
     /**
      * The console command description.
@@ -38,20 +38,21 @@ class LuckyBall extends Command
      */
     public function handle()
     {
-        // 随机数生成中奖号码
-        $luckyResult = $this->luckyBall();
-
         // 获取最近一期期数
         $drawNum = History::query()->max('draw_num');
 
-        // 预测结果写入数据库
-        $luckBall = new \App\Models\Lottery\LuckyBall([
-            'draw_num'     => ((int) $drawNum + 1),
-            'lucky_result' => $luckyResult
-        ]);
-        $luckBall->save();
+        for ($i = 1; $i <= $this->argument('count'); $i++) {
+            // 随机数生成中奖号码
+            $luckyResult = $this->luckyBall();
+            // 预测结果写入数据库
+            $luckBall = new \App\Models\Lottery\LuckyBall([
+                'draw_num'     => ((int) $drawNum + 1),
+                'lucky_result' => $luckyResult
+            ]);
+            $luckBall->save();
 
-        $this->info('- Lucky ball: '.$luckyResult);
+            $this->info('- Lucky ball: '.$luckyResult);
+        }
     }
 
     /**
