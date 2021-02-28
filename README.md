@@ -1,15 +1,21 @@
-### sync:history {pageSize=30}
+#### 同步开奖历史数据
 
-同步最新开奖数据，返回同步结果 `true | false`
+```shell
+php artisan sync:history {pageSize=30}
+```
 
-### searchByQi
 
-根据期号查询中奖号码
 
-### searchByDateRange
+#### 生成幸运球
 
-根据日期范围查询中奖号码
+```shell
+php artisan luckyballs {count=1}
+```
 
-### luckyball
 
-中奖号码预测
+
+#### 计算幸运球中奖规则、中奖金额
+
+```shell
+php artisan calculate:lucky
+```
