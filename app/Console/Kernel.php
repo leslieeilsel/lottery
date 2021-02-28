@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Console\Commands\CalculateLuckyResult;
+use App\Console\Commands\LuckyBall;
 use App\Console\Commands\SyncHistory;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -15,6 +17,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         SyncHistory::class,
+        LuckyBall::class,
+        CalculateLuckyResult::class,
     ];
 
     /**
