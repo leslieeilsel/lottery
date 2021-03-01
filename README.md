@@ -1,24 +1,27 @@
 <h1 align="center">大乐透预测</h1>
 
-#### 同步开奖历史数据
+#### Usage
 
-```shell
-php artisan sync:history {pageSize=30}
-```
+- 同步开奖历史数据
 
-
-#### 生成幸运球
-
-```shell
-php artisan luckyballs {count=1} {draw?}
-```
+  ```shell
+  php artisan sync:history {pageSize=30}
+  ```
 
 
-#### 计算幸运球中奖规则、中奖金额
+- 生成幸运球
 
-```shell
-php artisan calculate:lucky
-```
+  ```shell
+  php artisan luckyballs {count=1} {draw?}
+  ```
+
+
+- 计算幸运球中奖规则、中奖金额
+
+  ```shell
+  php artisan sync:history {pageSize=30}
+  ```
+
 
 
 #### 模拟中奖情况
@@ -30,5 +33,13 @@ php artisan calculate:lucky
 
 
 
-> 购彩有节制，请理性投注！
+#### TODO
+
+- [ ] 支持生成 **胆拖式** 模拟号
+- [ ] 支持生成 **复式** 模拟号
+- [ ] 优化模拟算法
+
+
+
+> 购彩有节制，投注需理性！
 

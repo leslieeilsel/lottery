@@ -13,7 +13,7 @@ class CalculateLuckyResult extends Command
      *
      * @var string
      */
-    protected $signature = 'calculateLuckyResult';
+    protected $signature = 'calculate:lucky';
 
     /**
      * The console command description.
