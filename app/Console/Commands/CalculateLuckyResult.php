@@ -35,13 +35,14 @@ class CalculateLuckyResult extends Command
     /**
      * Execute the console command.
      *
-     * @return int
+     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $unCalculate = LuckyBall::query()->whereNull('winning_condition')->get()->toArray();
+        $amountSum = 0;
 
-        foreach ($unCalculate as $item) {
+        foreach ($unCalculate as $key => $item) {
             $result = History::query()->firstWhere('draw_num', $item['draw_num']);
             if ($result) {
                 // 分区备用
@@ -56,22 +57,33 @@ class CalculateLuckyResult extends Command
 
                 // 计算中奖金额
                 $amount = $this->calculateWinningAmount($condition, $result['prize_level_list']);
+                $amountSum += str_replace(',', '', $amount);
 
                 $result = LuckyBall::query()
                     ->where('id', $item['id'])
                     ->update([
-                    'winning_condition' => $condition,
-                    'winning_amount'    => $amount,
-                ]);
+                        'winning_condition' => $condition,
+                        'winning_amount'    => $amount,
+                    ]);
 
                 if ($result) {
-                    $this->info($item['draw_num'].' | '.$item['lucky_result'].' | '.$condition.' | '.$amount);
+                    $this->info($key.' | '.$item['draw_num'].' | '.$item['lucky_result'].' | '.$condition.' | '.$amount);
                 }
             }
         }
+        $this->info('- Total count: '.count($unCalculate).' !');
+        $this->info('- Total amount: ¥'.$amountSum.' !');
     }
 
-    public function calculateWinningAmount($condition, $levelList)
+    /**
+     * 计算中奖金额
+     *
+     * @param $condition
+     * @param $levelList
+     *
+     * @return string
+     */
+    public function calculateWinningAmount($condition, $levelList): string
     {
         $role = collect([
             ['level' => '一等奖', 'condition' => '5+2'],

@@ -11,7 +11,7 @@ php artisan sync:history {pageSize=30}
 #### 生成幸运球
 
 ```shell
-php artisan luckyballs {count=1}
+php artisan luckyballs {count=1} {draw?}
 ```
 
 

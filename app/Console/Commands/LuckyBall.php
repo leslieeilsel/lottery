@@ -12,7 +12,7 @@ class LuckyBall extends Command
      *
      * @var string
      */
-    protected $signature = 'luckyballs {count=1}';
+    protected $signature = 'luckyballs {count=1} {draw?}';
 
     /**
      * The console command description.
@@ -34,35 +34,38 @@ class LuckyBall extends Command
     /**
      * Execute the console command.
      *
-     * @return int
+     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
+        $lastDraw = History::query()->max('draw_num');
         // 获取最近一期期数
-        $drawNum = History::query()->max('draw_num');
+        $drawNum = $this->argument('draw') ?? (string) ((int) $lastDraw + 1);
 
         for ($i = 1; $i <= $this->argument('count'); $i++) {
             // 随机数生成中奖号码
-            $luckyResult = $this->luckyBall();
+            $luckyResult = $this->luckyBall($drawNum);
             // 预测结果写入数据库
             $luckBall = new \App\Models\Lottery\LuckyBall([
-                'draw_num'     => ((int) $drawNum + 1),
+                'draw_num'     => $drawNum,
                 'lucky_result' => $luckyResult
             ]);
             $luckBall->save();
 
-            $this->info('- Lucky ball: '.$luckyResult);
+            $this->info('- Lucky ball '.$i.' : '.$luckyResult);
         }
     }
 
     /**
      * 随机算法生成大乐透中奖号码
      *
+     * @param $drawNum
+     *
      * @return string
      */
-    public function luckyBall(): string
+    public function luckyBall($drawNum): string
     {
-        return implode(' ', $this->uniqueRand(1, 35, 5)).' '.implode(' ', $this->uniqueRand(1, 12, 2));
+        return implode(' ', $this->analyzeHistory($drawNum)).' '.implode(' ', $this->uniqueRand(1, 12, 2));
     }
 
     /**
@@ -87,5 +90,110 @@ class LuckyBall extends Command
         asort($return);
 
         return $return;
+    }
+
+    /**
+     * 分析历史数据，预测幸运球
+     *
+     * @param $drawNum
+     *
+     * @return array
+     */
+    public function analyzeHistory($drawNum): array
+    {
+        // 分区计算出现次数
+        // 计算每个区域中出现球的多少
+        // 计算球的出现概率，结合最大出现数
+        // 计算奇偶数
+        // 计算出现次数
+        $oddCount = $this->calculateOddTrend($drawNum);
+
+        return $this->checkOddCountRole($oddCount);
+    }
+
+    /**
+     * 根据最近五期奇数出现次数，推测下一期奇偶数
+     *
+     * @param $drawNum
+     *
+     * @return string
+     */
+    public function calculateOddTrend($drawNum): string
+    {
+        $last5Draw = History::query()
+            ->where('draw_num', '<', $drawNum)->orderByDesc('draw_time')->limit(5)->pluck('draw_result')->toArray();
+        $oddCount = [];
+        foreach ($last5Draw as $item) {
+            $oddCount[] = $this->oddCount(array_slice(explode(' ', $item), 0, 5));
+        }
+
+        return $this->trendNextOddCount($oddCount);
+    }
+
+    /**
+     * 预测下期奇数量
+     *
+     * @param $oddCount
+     *
+     * @return string
+     */
+    public function trendNextOddCount($oddCount): string
+    {
+        $count = '3';
+
+        // 奇数量限制在 2,3,4
+        if ($oddCount[0] === 2) {
+            $count = '3,4';
+        } elseif ($oddCount[0] === 3) {
+            $count = '2,3,4';
+        } elseif ($oddCount[0] === 4) {
+            $count = '2,3';
+        }
+
+        return $count;
+    }
+
+    /**
+     * 生成前区号码，使其匹配奇数量预测
+     *
+     * @param $oddCount
+     *
+     * @return array
+     */
+    public function checkOddCountRole($oddCount): array
+    {
+        $front = $this->uniqueRand(1, 35, 5);
+        $frontOddCount = $this->oddCount($front);
+        if (!in_array($frontOddCount, explode(',', $oddCount), false)) {
+            $this->checkOddCountRole($oddCount);
+        }
+
+        return $front;
+    }
+
+    /**
+     * 判断是否为奇数
+     *
+     * @param $num
+     *
+     * @return int
+     */
+    public function odd($num): int
+    {
+        return ($num & 1);
+    }
+
+    /**
+     * 计算数组内奇数出现的次数
+     *
+     * @param $array
+     *
+     * @return int
+     */
+    public function oddCount($array): int
+    {
+        return collect($array)->filter(function ($value) {
+            return $this->odd((int) $value);
+        })->count();
     }
 }
