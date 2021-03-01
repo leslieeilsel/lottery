@@ -18,7 +18,7 @@ class CreateLotteryLuckyballsTable extends Migration
             $table->string('draw_num')->comment('期数');
             $table->string('lucky_result')->comment('预测号码');
             $table->string('winning_condition')->nullable()->comment('中奖条件');
-            $table->string('winning_amount')->nullable()->comment('中奖金额');
+            $table->integer('winning_amount')->nullable()->comment('中奖金额');
             $table->timestamps();
         });
     }

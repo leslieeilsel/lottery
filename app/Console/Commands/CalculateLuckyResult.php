@@ -81,9 +81,9 @@ class CalculateLuckyResult extends Command
      * @param $condition
      * @param $levelList
      *
-     * @return string
+     * @return int
      */
-    public function calculateWinningAmount($condition, $levelList): string
+    public function calculateWinningAmount($condition, $levelList): int
     {
         $role = collect([
             ['level' => '一等奖', 'condition' => '5+2'],
@@ -106,9 +106,9 @@ class CalculateLuckyResult extends Command
         if ($level) {
             $amount = collect(json_decode($levelList, true))->firstWhere('prizeLevel', $level['level']);
 
-            return $amount['stakeAmount'];
+            return (int) str_replace(',', '', $amount['stakeAmount']);
         }
 
-        return '0';
+        return 0;
     }
 }
