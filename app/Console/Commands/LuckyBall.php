@@ -155,6 +155,7 @@ class LuckyBall extends Command
      * 生成前区号码，使其匹配奇数量预测
      *
      * @param $oddCount
+     * @param $lastDrawRest
      *
      * @return array
      */
@@ -162,12 +163,12 @@ class LuckyBall extends Command
     {
         $front = $this->uniqueRand(1, 35, 5);
         if ($this->checkHasLastDrawResult($front, array_slice(explode(' ', $lastDrawRest), 0, 5))) {
-            $this->checkOddCountRole($oddCount, $lastDrawRest);
-        } else {
             $frontOddCount = $this->oddCount($front);
             if (!in_array($frontOddCount, explode(',', $oddCount), false)) {
                 $this->checkOddCountRole($oddCount, $lastDrawRest);
             }
+        } else {
+            $this->checkOddCountRole($oddCount, $lastDrawRest);
         }
 
         return $front;
