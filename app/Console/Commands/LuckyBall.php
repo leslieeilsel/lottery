@@ -201,7 +201,7 @@ class LuckyBall extends Command
     }
 
     /**
-     * 检测是否存在上期数字，若存在返回 false
+     * 上帝决定是否检测上期存在的数字，若存在返回 false
      *
      * @param $luckyBall
      * @param $lastBall
@@ -210,12 +210,24 @@ class LuckyBall extends Command
      */
     public function checkHasLastDrawResult($luckyBall, $lastBall): bool
     {
-        foreach ($luckyBall as $k => $item) {
-            if (in_array($item, $lastBall, false)) {
-                return false;
+        if (!$this->admiredGod()) {
+            foreach ($luckyBall as $k => $item) {
+                if (in_array($item, $lastBall, false)) {
+                    return false;
+                }
             }
         }
 
         return true;
+    }
+
+    /**
+     * 上帝算法
+     *
+     * @return bool
+     */
+    public function admiredGod(): bool
+    {
+        return (bool) random_int(0, 1);
     }
 }
