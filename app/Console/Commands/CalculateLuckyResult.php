@@ -39,7 +39,9 @@ class CalculateLuckyResult extends Command
      */
     public function handle(): void
     {
-        $unCalculate = LuckyBall::query()->whereNull('winning_condition')->get()->toArray();
+        $lastDrawNum = History::query()->orderByDesc('draw_num')->pluck('draw_num')->first();
+        $unCalculate = LuckyBall::query()
+            ->where('draw_num', '<=', $lastDrawNum)->whereNull('winning_condition')->get()->toArray();
         $amountSum = 0;
 
         foreach ($unCalculate as $key => $item) {
@@ -67,7 +69,7 @@ class CalculateLuckyResult extends Command
                     ]);
 
                 if ($result) {
-                    $this->info(($key + 1).' | '.$item['draw_num'].' | '.$item['lucky_result'].' | '.$condition.' | '.$amount);
+                    $this->info(($key + 1).'/'.count($unCalculate).' | '.$item['draw_num'].' | '.$item['lucky_result'].' | '.$condition.' | '.$amount);
                 }
             }
         }

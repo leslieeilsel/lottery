@@ -5,7 +5,6 @@ namespace App\Console\Commands;
 use App\Models\Lottery\History;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
-use App\Models\Lottery\LuckyBall;
 
 class SyncHistory extends Command
 {

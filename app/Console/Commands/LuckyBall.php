@@ -102,11 +102,11 @@ class LuckyBall extends Command
     public function analyzeHistory($drawNum): array
     {
         // 上期出现的本期不出现
-        $lastDrawRest = History::query()->where('draw_num', $drawNum - 1)->pluck('draw_result')->first();
+        $lastDrawResult = History::query()->where('draw_num', $drawNum - 1)->pluck('draw_result')->first();
         // 计算出现次数
         $oddCount = $this->calculateOddTrend($drawNum);
 
-        return $this->checkOddCountRole($oddCount, $lastDrawRest);
+        return $this->checkOddCountRole($oddCount, $lastDrawResult);
     }
 
     /**
@@ -155,23 +155,23 @@ class LuckyBall extends Command
      * 生成前区号码，使其匹配奇数量预测
      *
      * @param $oddCount
-     * @param $lastDrawRest
+     * @param $lastDrawResult
      *
      * @return array
      */
-    public function checkOddCountRole($oddCount, $lastDrawRest): array
+    public function checkOddCountRole($oddCount, $lastDrawResult): array
     {
         $front = $this->uniqueRand(1, 35, 5);
-        if ($this->checkHasLastDrawResult($front, array_slice(explode(' ', $lastDrawRest), 0, 5))) {
+        if ($this->checkHasLastDrawResult($front, array_slice(explode(' ', $lastDrawResult), 0, 5))) {
             $frontOddCount = $this->oddCount($front);
             if (!in_array($frontOddCount, explode(',', $oddCount), false)) {
-                $this->checkOddCountRole($oddCount, $lastDrawRest);
+                $this->checkOddCountRole($oddCount, $lastDrawResult);
             }
-        } else {
-            $this->checkOddCountRole($oddCount, $lastDrawRest);
+
+            return $front;
         }
 
-        return $front;
+        return $this->checkOddCountRole($oddCount, $lastDrawResult);
     }
 
     /**
