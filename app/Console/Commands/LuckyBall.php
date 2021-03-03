@@ -101,14 +101,12 @@ class LuckyBall extends Command
      */
     public function analyzeHistory($drawNum): array
     {
-        // 分区计算出现次数
-        // 计算每个区域中出现球的多少
-        // 计算球的出现概率，结合最大出现数
-        // 计算奇偶数
+        // 上期出现的本期不出现
+        $lastDrawRest = History::query()->where('draw_num', $drawNum - 1)->pluck('draw_result')->first();
         // 计算出现次数
         $oddCount = $this->calculateOddTrend($drawNum);
 
-        return $this->checkOddCountRole($oddCount);
+        return $this->checkOddCountRole($oddCount, $lastDrawRest);
     }
 
     /**
@@ -160,12 +158,16 @@ class LuckyBall extends Command
      *
      * @return array
      */
-    public function checkOddCountRole($oddCount): array
+    public function checkOddCountRole($oddCount, $lastDrawRest): array
     {
         $front = $this->uniqueRand(1, 35, 5);
-        $frontOddCount = $this->oddCount($front);
-        if (!in_array($frontOddCount, explode(',', $oddCount), false)) {
-            $this->checkOddCountRole($oddCount);
+        if ($this->checkHasLastDrawResult($front, array_slice(explode(' ', $lastDrawRest), 0, 5))) {
+            $this->checkOddCountRole($oddCount, $lastDrawRest);
+        } else {
+            $frontOddCount = $this->oddCount($front);
+            if (!in_array($frontOddCount, explode(',', $oddCount), false)) {
+                $this->checkOddCountRole($oddCount, $lastDrawRest);
+            }
         }
 
         return $front;
@@ -195,5 +197,24 @@ class LuckyBall extends Command
         return collect($array)->filter(function ($value) {
             return $this->odd((int) $value);
         })->count();
+    }
+
+    /**
+     * 检测是否存在上期数字，若存在返回 false
+     *
+     * @param $luckyBall
+     * @param $lastBall
+     *
+     * @return bool
+     */
+    public function checkHasLastDrawResult($luckyBall, $lastBall): bool
+    {
+        foreach ($luckyBall as $k => $item) {
+            if (in_array($item, $lastBall, false)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

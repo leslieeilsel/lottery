@@ -67,7 +67,7 @@ class CalculateLuckyResult extends Command
                     ]);
 
                 if ($result) {
-                    $this->info($key.' | '.$item['draw_num'].' | '.$item['lucky_result'].' | '.$condition.' | '.$amount);
+                    $this->info(($key + 1).' | '.$item['draw_num'].' | '.$item['lucky_result'].' | '.$condition.' | '.$amount);
                 }
             }
         }
